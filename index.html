@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chanka | Vaccine Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Noto+Sans+Ethiopic:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="offline-pill" id="offlinePill">You're offline — showing saved data</div>
+
+<div class="app">
+
+  <!-- ONBOARDING -->
+  <div class="screen" id="screen-onboard">
+    <div class="onboard">
+      <div class="mark">ኪ</div>
+      <h1 id="ob-title">Set up the profile</h1>
+      <p class="sub" id="ob-sub">Enter a few details to generate the vaccine schedule. This stays on this device.</p>
+      <label id="lbl-name">Full name</label>
+      <input id="in-name" placeholder="e.g. Betelhem Tesfaye" />
+      <label id="lbl-dob">Date of birth</label>
+      <input id="in-dob" type="date" />
+      <label id="lbl-sex">Sex</label>
+      <select id="in-sex">
+        <option value="female" id="opt-f">Female</option>
+        <option value="male" id="opt-m">Male</option>
+      </select>
+      <div style="margin-top:26px;">
+        <button class="btn block" id="btn-create">Create profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div class="screen" id="screen-app">
+    <header class="top">
+      <div class="brand">
+        <h1 id="brand-title">Chanka</h1>
+        <button class="profile-chip" id="profileChip">
+          <span class="avatar" id="profileChipAvatar">?</span>
+          <span id="profileChipName">Vaccine record</span>
+          <span class="caret">⌄</span>
+        </button>
+      </div>
+      <div class="lang-toggle">
+        <button id="lang-en" class="active">EN</button>
+        <button id="lang-am">አማ</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- HOME -->
+      <div class="screen active" id="tab-home">
+        <div id="home-banner"></div>
+        <div class="section-title" id="st-upcoming">Upcoming &amp; overdue</div>
+        <div id="home-upcoming"></div>
+        <div class="section-title" id="st-completed">Completed</div>
+        <div id="home-completed"></div>
+      </div>
+
+      <!-- CARD -->
+      <div class="screen" id="tab-card">
+        <div class="official-card" id="official-card"></div>
+        <button class="btn secondary block" id="btn-print-cert" style="margin-top:16px;">Open printable certificate</button>
+      </div>
+
+      <!-- CATALOG -->
+      <div class="screen" id="tab-catalog">
+        <div class="section-title" id="st-catalog">Vaccine catalog</div>
+        <div id="catalog-list"></div>
+      </div>
+
+      <!-- FACILITIES -->
+      <div class="screen" id="tab-facilities">
+        <div class="section-title" id="st-facilities">Nearby facilities</div>
+        <p style="font-size:12px;color:var(--ink-soft);margin-top:-4px;margin-bottom:14px;" id="facility-note">Sample listings for this prototype. In production this pulls from a live, moderated dataset.</p>
+        <div id="facility-list"></div>
+      </div>
+
+      <!-- LOG / SIDE EFFECTS -->
+      <div class="screen" id="tab-log">
+        <div class="section-title" id="st-log">Report a symptom</div>
+        <label id="lbl-log-vaccine">Which dose was this after?</label>
+        <select id="log-vaccine"></select>
+        <label id="lbl-log-symptom">Symptom</label>
+        <select id="log-symptom">
+          <option value="fever_mild">Mild fever</option>
+          <option value="fever_high">High fever (39°C+)</option>
+          <option value="soreness">Soreness / swelling at injection site</option>
+          <option value="rash">Rash</option>
+          <option value="fussiness">Fussiness / crying more than usual</option>
+          <option value="breathing">Difficulty breathing</option>
+          <option value="seizure">Seizure or convulsion</option>
+          <option value="swelling_severe">Severe swelling of face/throat</option>
+        </select>
+        <button class="btn block" id="btn-log-symptom" style="margin-top:16px;">Check guidance</button>
+        <div id="triage-result"></div>
+
+        <div class="section-title" id="st-log-history">Log history</div>
+        <div id="log-history"></div>
+      </div>
+
+      <!-- QR -->
+      <div class="screen" id="tab-qr">
+        <div class="section-title" id="st-qr">Shareable record</div>
+        <div class="qr-box">
+          <div id="qrcanvas"></div>
+          <div style="font-size:12px;color:var(--ink-soft);text-align:center;" id="qr-caption">Show this at a facility to share the record on file.</div>
+        </div>
+      </div>
+    </main>
+
+    <nav class="tabs">
+      <button data-tab="tab-home" class="active"><span class="dot"></span><span data-i18n="nav-home">Home</span></button>
+      <button data-tab="tab-card"><span class="dot"></span><span data-i18n="nav-card">Card</span></button>
+      <button data-tab="tab-catalog"><span class="dot"></span><span data-i18n="nav-catalog">Catalog</span></button>
+      <button data-tab="tab-facilities"><span class="dot"></span><span data-i18n="nav-facilities">Facilities</span></button>
+      <button data-tab="tab-log"><span class="dot"></span><span data-i18n="nav-log">Log</span></button>
+      <button data-tab="tab-qr"><span class="dot"></span><span data-i18n="nav-qr">QR</span></button>
+    </nav>
+  </div>
+
+</div>
+
+<!-- DOSE MODAL -->
+<div class="overlay" id="doseOverlay">
+  <div class="modal">
+    <h2 id="modal-title">Log dose</h2>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- PROFILE SWITCHER -->
+<div class="overlay" id="profileOverlay">
+  <div class="modal">
+    <h2 id="ps-title">Profiles</h2>
+    <div id="profile-list"></div>
+    <button class="btn secondary block" id="btn-add-profile" style="margin-top:6px;">+ Add profile</button>
+  </div>
+</div>
+
+<!-- PROFILE ADD/EDIT FORM -->
+<div class="overlay" id="profileFormOverlay">
+  <div class="modal">
+    <h2 id="pf-title">Add profile</h2>
+    <label id="pf-lbl-name">Full name</label>
+    <input id="pf-name" />
+    <label id="pf-lbl-dob">Date of birth</label>
+    <input id="pf-dob" type="date" />
+    <label id="pf-lbl-sex">Sex</label>
+    <select id="pf-sex">
+      <option value="female" id="pf-opt-f">Female</option>
+      <option value="male" id="pf-opt-m">Male</option>
+    </select>
+    <div class="modal-actions">
+      <button class="btn secondary block" id="pf-cancel">Cancel</button>
+      <button class="btn block" id="pf-save">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- CERTIFICATE (hidden until print) -->
+<div class="cert" id="certificate" style="display:none;"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
